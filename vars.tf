@@ -1,3 +1,13 @@
+variable "name" {
+    default = "test"
+    type =  string
+}
+
+variable "environment" {
+    default = "prod"
+    type =string  
+}
+
 variable "cluster-name" {
     default  = "test"
     type = string

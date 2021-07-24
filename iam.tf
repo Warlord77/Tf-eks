@@ -1,5 +1,6 @@
-resource "aws_iam_role" "demo" {
-  name = var.cluster-name
+resource "aws_iam_role" "eks_cluster_role" {
+  name                  = "${var.name}-eks-cluster-role"
+  force_detach_policies = true
 
   assume_role_policy = <<POLICY
 {
@@ -8,7 +9,10 @@ resource "aws_iam_role" "demo" {
     {
       "Effect": "Allow",
       "Principal": {
-        "Service": "eks.amazonaws.com"
+        "Service": [
+          "eks.amazonaws.com",
+          "eks-fargate-pods.amazonaws.com"
+          ]
       },
       "Action": "sts:AssumeRole"
     }
@@ -17,14 +21,12 @@ resource "aws_iam_role" "demo" {
 POLICY
 }
 
-resource "aws_iam_role_policy_attachment" "demo-AmazonEKSClusterPolicy" {
+resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.demo.name
+  role       = aws_iam_role.eks_cluster_role.name
 }
 
-# Optionally, enable Security Groups for Pods
-# Reference: https://docs.aws.amazon.com/eks/latest/userguide/security-groups-for-pods.html
-resource "aws_iam_role_policy_attachment" "demo-AmazonEKSVPCResourceController" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
-  role       = aws_iam_role.demo.name
+resource "aws_iam_role_policy_attachment" "AmazonEKSServicePolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+  role       = aws_iam_role.eks_cluster_role.name
 }
